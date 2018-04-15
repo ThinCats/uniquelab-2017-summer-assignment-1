@@ -116,7 +116,11 @@ Set::Node* Set::rotates(Node* a_node) {
 
     if(a_node->right_==nullptr && a_node->left_==nullptr)
         return a_node;
-    // Tranvers:
+    // Tranvers
+    // There is an unwise judgement that if a node has two red son, 
+    // then they will first rotateLeft and then rotateRight and then rotateMiddle
+    // It is actually just only needed to rotateMiddle once.
+    // qq
     if(a_node->right_ == nullptr)
         ;
     else if(a_node->right_->is_red())
@@ -245,6 +249,7 @@ Set::Node* Set::deleteMin(Node* a_node) {
         ;
     else if(a_node->left_->left_->is_red() == true)
         ;
+    // 如果左字结点不为3结点， 为了让最小值在3结点只有从上至下传递
     else {
         a_node = a_node->moveRedLeft(a_node);
     }
@@ -259,17 +264,14 @@ Set::Node* Set::deleteMin(Node* a_node) {
 Set::Node* Set::deleteMax(Node* a_node) {
 
     //a_node is the last one
+    // it is a little different than deleteMin
+    // because it is possible that the max_node has a right subnode tree.
     if(a_node->right_ == nullptr && a_node->left_ == nullptr) {
         delete a_node;
         return nullptr;
     }
-    //向右转， 为了能方便给子结点元素
-    // 同时， 删除时也不会影响其他树
-    if(a_node->left_==nullptr)
-        ;
-    else if(a_node->left_->is_red() == true)
-        a_node = a_node->rotateRight(a_node);
-
+        
+    // an exception that has right subnode tree
     if(a_node->right_ == nullptr && a_node->left_!=nullptr) {
         Node *tmp = a_node->left_;
         delete a_node;
@@ -283,8 +285,8 @@ Set::Node* Set::deleteMax(Node* a_node) {
     //默认为左倾树
     else if(a_node->right_->left_ == nullptr)
         ;
-    else if(a_node->right_->left_->is_red() == true)
-        ;
+    else if(a_node->right_->left_->is_red() == true)     ;
+        
     else {
         a_node = a_node->moveRedRight(a_node);
 
@@ -451,12 +453,12 @@ Set::Node* Set::Node::moveRedLeft(Node* a_node) {
     // if subNodes are all 2-node
     //End node
     if(a_node->right_==nullptr)
-        ;
+        ; //no brother node
     else if(a_node->right_->left_==nullptr)
-        ;
+        ; //brother node is not 3 node
     
     else if(a_node->right_->left_->is_red() == false)
-        ;
+        ; // brother node is not 3 node(universal)
     //if brother node is 3-node
     else {
         // to make brother node easier to give element
@@ -473,7 +475,7 @@ Set::Node* Set::Node::moveRedLeft(Node* a_node) {
 //For max
 Set::Node* Set::Node::moveRedRight(Node* a_node) {
     a_node = fatherGiveColor(a_node);
-
+    // 3 lines down here are for checking whether the target node is in 3/4 node
     if(a_node->left_==nullptr)
         ;
     else if(a_node->left_->left_==nullptr)
